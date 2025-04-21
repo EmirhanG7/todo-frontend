@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMe } from '../api';
-import {toast} from "react-toastify";
+import { toast } from 'react-toastify';
 
 const API_BASE = import.meta.env.VITE_API_BASE;
-
 
 const Todos = () => {
   const [todos, setTodos] = useState([]);
@@ -15,7 +14,6 @@ const Todos = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -52,7 +50,6 @@ const Todos = () => {
     }
   };
 
-
   const handleAdd = async () => {
     if (!title.trim()) return;
     const res = await fetch(`${API_BASE}/todos`, {
@@ -69,18 +66,18 @@ const Todos = () => {
     setTitle('');
   };
 
-  const handleToggle = async (id) => {
+  const handleToggle = async (id, currentStatus) => {
     const res = await fetch(`${API_BASE}/todos/${id}`, {
       method: 'PATCH',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
+      body: JSON.stringify({ completed: !currentStatus }),
     });
     const updated = await res.json();
     toast.info('Durum değiştirildi');
-    setTodos(
-      todos.map((todo) => (todo.id === id ? updated : todo))
-    );
+    setTodos(todos.map((todo) => (todo.id === id ? updated : todo)));
   };
 
   const handleDelete = async (id) => {
@@ -100,13 +97,18 @@ const Todos = () => {
   };
 
   const handleEditSubmit = async (id) => {
+    const todoToUpdate = todos.find((t) => t.id === id);
+
     const res = await fetch(`${API_BASE}/todos/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ title: editTitle }),
+      body: JSON.stringify({
+        title: editTitle,
+        completed: todoToUpdate.completed,
+      }),
     });
 
     const updated = await res.json();
@@ -114,7 +116,6 @@ const Todos = () => {
     setEditingId(null);
     toast.success('Todo güncellendi');
   };
-
 
   if (loading) return <p className="text-center mt-10">Yükleniyor...</p>;
   if (error) return <p className="text-center text-red-500 mt-10">{error}</p>;
@@ -169,14 +170,14 @@ const Todos = () => {
               </>
             ) : (
               <>
-        <span
-          onClick={() => handleToggle(todo.id)}
-          className={`cursor-pointer flex-1 ${
-            todo.completed ? 'line-through text-gray-500' : ''
-          }`}
-        >
-          {todo.title}
-        </span>
+                <span
+                  onClick={() => handleToggle(todo.id, todo.completed)}
+                  className={`cursor-pointer flex-1 ${
+                    todo.completed ? 'line-through text-gray-500' : ''
+                  }`}
+                >
+                  {todo.title}
+                </span>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => {
@@ -201,7 +202,6 @@ const Todos = () => {
       </ul>
     </div>
   );
-
 };
 
 export default Todos;
