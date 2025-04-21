@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { getMe } from '../api';
 import {toast} from "react-toastify";
 
+const API_BASE = import.meta.env.VITE_API_BASE;
+
+
 const Todos = () => {
   const [todos, setTodos] = useState([]);
   const [user, setUser] = useState(null);
@@ -38,7 +41,7 @@ const Todos = () => {
 
   const fetchTodos = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/todos', {
+      const res = await fetch(`${API_BASE}/todos`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -52,7 +55,7 @@ const Todos = () => {
 
   const handleAdd = async () => {
     if (!title.trim()) return;
-    const res = await fetch('http://localhost:3001/api/todos', {
+    const res = await fetch(`${API_BASE}/todos`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -67,7 +70,7 @@ const Todos = () => {
   };
 
   const handleToggle = async (id) => {
-    const res = await fetch(`http://localhost:3001/api/todos/${id}`, {
+    const res = await fetch(`${API_BASE}/todos/${id}`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -81,7 +84,7 @@ const Todos = () => {
   };
 
   const handleDelete = async (id) => {
-    await fetch(`http://localhost:3001/api/todos/${id}`, {
+    await fetch(`${API_BASE}/todos/${id}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -97,7 +100,7 @@ const Todos = () => {
   };
 
   const handleEditSubmit = async (id) => {
-    const res = await fetch(`http://localhost:3001/api/todos/${id}`, {
+    const res = await fetch(`${API_BASE}/todos/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

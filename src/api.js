@@ -2,6 +2,8 @@
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 
+
+
 export const register = async (data) => {
   const res = await fetch(`${API_BASE}/auth/register`, {
     method: 'POST',
