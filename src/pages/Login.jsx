@@ -23,7 +23,7 @@ const Login = () => {
     if (result?.token) {
       localStorage.setItem('token', result.token);
       toast.success('Giriş başarılı!');
-      navigate('/todos');
+      navigate('/');
     } else {
       toast.error('Giriş başarısız: ' + (result?.error || 'Bilinmeyen hata'));
     }
