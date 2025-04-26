@@ -1,12 +1,60 @@
-# React + Vite
+ # Todo App - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Bu proje, React.js kullanılarak geliştirilmiş bir Todo kullanıcı arayüzüdür.  
+Kullanıcı kaydı, girişi, oturum yönetimi ve todo işlemleri içerir.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Kullanılan Teknolojiler
 
-## Expanding the ESLint configuration
+- React.js
+- Vite.js
+- Redux Toolkit
+- React Router DOM
+- Tailwind CSS
+- Fetch API
+- react-toastify (bildirimler için)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## Kurulum
+
+1. Bağımlılıkları yükleyin:
+
+```bash
+npm install
+```
+
+2. `.env` dosyası oluşturun:
+
+```env
+VITE_API_BASE=https://todo-backend-9s5z.onrender.com/api
+```
+
+> Geliştirme ortamında `VITE_API_BASE=http://localhost:3001/api` kullanabilirsiniz.
+
+3. Uygulamayı başlatın:
+
+```bash
+npm run dev
+```
+
+---
+
+## Özellikler
+
+- Kullanıcı kaydı ve girişi
+- JWT ile güvenli oturum yönetimi
+- Yetkisiz kullanıcılar için Private Route koruması
+- Todos listesi ekleme, silme, düzenleme, tamamlandı durumu değiştirme
+- Toast bildirimleri
+- Tailwind ile responsive ve modern tasarım
+
+---
+
+## Notlar
+
+- CORS hatası almamak için backend doğru yapılandırılmış olmalıdır.
+- Vite.js proxy ayarı (`vite.config.js`) sayesinde local API çağrılarında sorun yaşanmaz.
+
+---
