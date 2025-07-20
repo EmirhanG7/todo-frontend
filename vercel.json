@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "https://todo-backend-production-2a57.up.railway.app"
+      "source": "/api/:path*",
+      "destination": "https://todo-backend-production-2a57.up.railway.app/api/:path*"
     },
     {
       "source": "/(.*)",
