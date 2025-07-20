@@ -2,12 +2,11 @@
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 
-
-
 export const register = async (data) => {
   const res = await fetch(`${API_BASE}/auth/register`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {'Content-Type': 'application/json'},
+    credentials: 'include',
     body: JSON.stringify(data),
   });
   return res.json();
@@ -16,16 +15,24 @@ export const register = async (data) => {
 export const login = async (data) => {
   const res = await fetch(`${API_BASE}/auth/login`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {'Content-Type': 'application/json'},
+    credentials: 'include',
     body: JSON.stringify(data),
   });
   return res.json();
 };
 
+export const logout = async () => {
+  const res = await fetch(`${API_BASE}/auth/logout`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+  return res.json();
+}
+
 export const getMe = async () => {
-  const token = localStorage.getItem('token');
   const res = await fetch(`${API_BASE}/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
   });
   return res.json();
 };

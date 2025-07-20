@@ -1,42 +1,58 @@
-import { Link, useNavigate, Outlet } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { getMe } from '../api.js';
-import {ToastContainer} from "react-toastify";
+import {Link, Outlet, Navigate, useNavigate, useLocation} from 'react-router-dom';
+import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import {useGetMeQuery, useLogoutMutation, userApi} from "../store/user.js";
+import {useDispatch} from "react-redux";
 
 const Layout = () => {
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const location = useLocation()
+  const publicPaths = ['/login', '/register']
+  const skipMe = publicPaths.includes(location.pathname)
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
 
-    getMe().then((res) => {
-      if (res?.user) setUser(res.user);
-    });
-  }, []);
+  const { data: me, isLoading, isError } = useGetMeQuery(undefined, {
+    skip: skipMe,
+    refetchOnMountOrArgChange: true,
+  })
+  const [logout, { isLoading: logoutLoading }] = useLogoutMutation()
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    navigate('/login');
-  };
+
+  if (!skipMe && isLoading) return <p>Yükleniyor..</p>
+
+  if (!skipMe && (isError || !me?.user)) {
+    return <Navigate to="/login" replace />
+  }
+
+
+  const handleLogout = async () => {
+    try {
+      await logout().unwrap()
+      dispatch(userApi.util.resetApiState())
+      toast.info('Çıkış yapıldı')
+      navigate('/login', {replace: true})
+    } catch (error) {
+      toast.error('çıkış yapılamadı', error)
+    }
+  }
+
 
   return (
     <>
-      <ToastContainer position="top-right" autoClose={2000} />
+      <ToastContainer position="top-right" autoClose={1000} />
       <div className="min-h-screen bg-gray-100 text-gray-900">
         <header className="bg-white shadow p-4 flex justify-between items-center">
           <h1 className="text-xl font-bold">
             <Link to="/">Fullstack Todo App</Link>
           </h1>
           <div>
-            {user ? (
+            {me?.user ? (
               <div className="flex items-center gap-3">
-                <span>{user.username}</span>
+                <span>{me?.user.username}</span>
                 <button
                   onClick={handleLogout}
+                  disabled={logoutLoading}
                   className="text-sm bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                 >
                   Çıkış Yap

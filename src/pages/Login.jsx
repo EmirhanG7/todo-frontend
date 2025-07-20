@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../api';
 import { toast } from 'react-toastify';
+import {useLoginMutation} from "../store/user.js";
 
 const Login = () => {
   const [form, setForm] = useState({ username: '', password: '' });
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [login, { isLoading, error }] = useLoginMutation()
 
 
 
@@ -16,16 +16,18 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    const result = await login(form);
-    setLoading(false);
 
-    if (result?.token) {
-      localStorage.setItem('token', result.token);
-      toast.success('Giriş başarılı!');
-      navigate('/');
-    } else {
-      toast.error('Giriş başarısız: ' + (result?.error || 'Bilinmeyen hata'));
+    try {
+      const result = await login(form).unwrap()
+      if (result?.user) {
+        toast.success('Giriş başarılı')
+        navigate('/')
+      } else {
+        toast.error(result.message || 'Giriş yapılamadı', error)
+      }
+
+    } catch {
+      toast.error('sunucu hatası', error)
     }
   };
 
@@ -50,11 +52,11 @@ const Login = () => {
           className="w-full mb-3 px-3 py-2 border rounded"
         />
         <button
-          disabled={loading}
+          disabled={isLoading}
           type="submit"
           className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
         >
-          {loading ? 'Giriş yapılıyor...' : 'Giriş'}
+          {isLoading ? 'Giriş yapılıyor...' : 'Giriş'}
         </button>
       </form>
     </div>

@@ -1,139 +1,76 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getMe } from '../api';
-import { toast } from 'react-toastify';
-
-const API_BASE = import.meta.env.VITE_API_BASE;
+import {useState} from 'react';
+import {toast} from 'react-toastify';
+import {useAddTodoMutation, useDeleteTodoMutation, useGetTodosQuery, useUpdateTodoMutation} from "../store/todo.js";
 
 const Todos = () => {
-  const [todos, setTodos] = useState([]);
-  const [user, setUser] = useState(null);
-  const [title, setTitle] = useState('');
+
+  const [newTitle, setNewTitle] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editTitle, setEditTitle] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
-  const token = localStorage.getItem('token');
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      setLoading(true);
-      try {
-        const res = await getMe();
-        if (res?.user) {
-          setUser(res.user);
-          await fetchTodos();
-        } else {
-          navigate('/login');
-        }
-      } catch (err) {
-        setError('Kullanıcı doğrulanamadı');
-        navigate('/login');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUser();
-  }, []);
+  const {data: todos = [], isLoading, isError, Error} = useGetTodosQuery();
+  const [addTodo, result] = useAddTodoMutation()
+  const [updateTodo] = useUpdateTodoMutation()
+  const [deleteTodo] = useDeleteTodoMutation()
 
-  const fetchTodos = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/todos`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setTodos(data);
-    } catch (err) {
-      setError('Todo listesi alınamadı');
-      toast.error('Todo verileri alınamadı');
-    }
-  };
+  console.log('isLoading', isLoading)
+  console.log('data', todos)
+  console.log('result', result.isLoading)
+
 
   const handleAdd = async () => {
-    if (!title.trim()) return;
-    const res = await fetch(`${API_BASE}/todos`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ title }),
-    });
-    const newTodo = await res.json();
-    toast.success('Todo eklendi');
-    setTodos([...todos, newTodo]);
-    setTitle('');
-  };
+    if (!newTitle.trim()) return
+    try {
+      await addTodo({title: newTitle}).unwrap()
+      toast.success('Todo eklendi')
+      setNewTitle('')
+    } catch (err) {
+      toast.error('Ekleme hatası')
+    }
+  }
 
-  const handleToggle = async (id, currentStatus) => {
-    const res = await fetch(`${API_BASE}/todos/${id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ completed: !currentStatus }),
-    });
-    const updated = await res.json();
-    toast.info('Durum değiştirildi');
-    setTodos(todos.map((todo) => (todo.id === id ? updated : todo)));
-  };
+  const handleToggle = async (todo) => {
+    try {
+      await updateTodo({id: todo.id, completed: !todo.completed}).unwrap()
+      toast.info('Durum güncellendi')
+    } catch {
+      toast.error('Güncelleme hatası')
+    }
+  }
 
   const handleDelete = async (id) => {
-    await fetch(`${API_BASE}/todos/${id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    toast.success('Silindi');
-    setTodos(todos.filter((todo) => todo.id !== id));
-  };
+    try {
+      await deleteTodo(id).unwrap()
+      toast.success('Silindi')
+    } catch {
+      toast.error('Silme hatası')
+    }
+  }
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
 
   const handleEditSubmit = async (id) => {
     const todoToUpdate = todos.find((t) => t.id === id);
 
-    const res = await fetch(`${API_BASE}/todos/${id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        title: editTitle,
-        completed: todoToUpdate.completed,
-      }),
-    });
+    try {
+      await updateTodo({id: todoToUpdate.id, title: editTitle,}).unwrap()
+      toast.info('Todo Güncellendi')
+    } catch (err) {
+      toast.error('Güncelleme hatası')
+    }
+  }
 
-    const updated = await res.json();
-    setTodos(todos.map((todo) => (todo.id === id ? updated : todo)));
-    setEditingId(null);
-    toast.success('Todo güncellendi');
-  };
 
-  if (loading) return <p className="text-center mt-10">Yükleniyor...</p>;
-  if (error) return <p className="text-center text-red-500 mt-10">{error}</p>;
+  if (isLoading) return <p className="text-center mt-10">Yükleniyor...</p>;
+  if (isError) return <p className="text-center text-red-500 mt-10">{Error}</p>;
 
   return (
     <div className="max-w-lg mx-auto p-4">
-      <h2 className="text-xl font-bold mb-4">Merhaba, {user?.username}</h2>
-      <button
-        onClick={handleLogout}
-        className="bg-red-500 text-white px-4 py-2 rounded mb-6 hover:bg-red-600"
-      >
-        Çıkış Yap
-      </button>
+
 
       <div className="flex gap-2 mb-4">
         <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={newTitle}
+          onChange={(e) => setNewTitle(e.target.value)}
           placeholder="Yeni todo"
           className="flex-1 border border-gray-300 rounded px-2 py-1"
         />
@@ -156,7 +93,10 @@ const Todos = () => {
                   className="border px-2 py-1 rounded flex-1"
                 />
                 <button
-                  onClick={() => handleEditSubmit(todo.id)}
+                  onClick={() => {
+                    handleEditSubmit(todo.id),
+                      setEditingId(null)
+                  }}
                   className="ml-2 text-green-600"
                 >
                   Kaydet
@@ -171,7 +111,7 @@ const Todos = () => {
             ) : (
               <>
                 <span
-                  onClick={() => handleToggle(todo.id, todo.completed)}
+                  onClick={() => handleToggle(todo)}
                   className={`cursor-pointer flex-1 ${
                     todo.completed ? 'line-through text-gray-500' : ''
                   }`}

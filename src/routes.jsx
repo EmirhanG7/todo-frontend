@@ -3,10 +3,19 @@ import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Todos from './pages/Todos.jsx';
 import { Navigate, Outlet } from 'react-router-dom';
+import {useGetMeQuery} from "./store/user.js";
 
 const PrivateRoute = () => {
-  const token = localStorage.getItem('token');
-  return token ? <Outlet /> : <Navigate to="/login" />;
+  const { data: me, isLoading, isError } = useGetMeQuery()
+  console.log(isError)
+
+  if (isLoading) return <p>Yükleniyor…</p>
+  if (isError || !me?.user) {
+    return <Navigate to="/login" replace />
+  }
+
+  return <Outlet />
+
 };
 
 export const routes = [

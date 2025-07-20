@@ -1,28 +1,25 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { register } from '../api';
 import { toast } from 'react-toastify';
+import {useRegisterMutation} from "../store/user.js";
 
 const Register = () => {
   const [form, setForm] = useState({ username: '', password: '' });
-  const [loading, setLoading] = useState(false);
-
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const [register, { isLoading }] = useRegisterMutation()
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const result = await register(form);
-    setLoading(false);
-
-    if (result?.username) {
-      toast.success('Kayıt başarılı!');
-      navigate('/login');
-    } else {
-      toast.error('Kayıt başarısız: ' + (result?.error || 'Bilinmeyen hata'));
+    e.preventDefault()
+    try {
+      const result = await register(form).unwrap()
+      toast.success('Kayıt başarılı, lütfen giriş yapın')
+      navigate('/login', { replace: true })
+    } catch (err) {
+      const msg = err?.data?.error || 'Kayıt sırasında bir hata oluştu'
+      toast.error(msg)
     }
   };
 
@@ -47,11 +44,11 @@ const Register = () => {
           className="w-full mb-3 px-3 py-2 border rounded"
         />
         <button
-          disabled={loading}
+          disabled={isLoading}
           type="submit"
           className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
         >
-          {loading ? 'Kayıt yapılıyor...' : 'Kayıt ol'}
+          {isLoading ? 'Kayıt yapılıyor...' : 'Kayıt ol'}
         </button>
       </form>
     </div>
