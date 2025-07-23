@@ -1,12 +1,44 @@
-# React + Vite
+# Todo Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Bu proje, React ve Redux Toolkit (RTK Query) kullanılarak oluşturulmuş bir Todo uygulamasının frontend kısmıdır. Kullanıcı kimlik doğrulaması, todo işlemleri (ekleme, silme, güncelleme) ve verilerin RTK Query ile önbelleğe alınması gibi işlevleri içerir.
 
-Currently, two official plugins are available:
+## Özellikler
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React ile modern kullanıcı arayüzü
+- Redux Toolkit + RTK Query ile global state yönetimi ve veri önbellekleme
+- JWT tabanlı oturum yönetimi
+- Form verisi işleme ve kullanıcı doğrulama
+- Kullanıcı giriş/çıkış işlemleri
+- Todo ekleme, silme, güncelleme, tamamlandı durumunu değiştirme
 
-## Expanding the ESLint configuration
+## Kurulum
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+git clone https://github.com/EmirhanG7/todo-frontend.git
+cd todo-frontend
+npm install
+```
+
+## Çalıştırma
+
+```bash
+npm run dev
+```
+
+> `.env` dosyasında `VITE_API_BASE` değişkeni backend API adresine ayarlanmalıdır:
+```
+VITE_API_BASE=https://todo-backend-xxxxx.onrender.com/api
+```
+
+## Kullanılan Teknolojiler
+
+- React
+- Redux Toolkit
+- RTK Query
+- Tailwind CSS
+- React Router DOM
+- Toastify
+
+---
+
+**Backend:** [todo-backend GitHub Reposu](https://github.com/EmirhanG7/todo-backend)
