@@ -3,6 +3,7 @@ import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import {useGetMeQuery, useLogoutMutation, userApi} from "../store/user.js";
 import {useDispatch} from "react-redux";
+import {todoApi} from "../store/todo.js";
 
 const Layout = () => {
   const navigate = useNavigate()
@@ -30,6 +31,7 @@ const Layout = () => {
     try {
       await logout().unwrap()
       dispatch(userApi.util.resetApiState())
+      dispatch(todoApi.util.resetApiState())
       toast.info('Çıkış yapıldı')
       navigate('/login', {replace: true})
     } catch (error) {

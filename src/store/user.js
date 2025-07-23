@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
+import {todoApi} from "./todo.js";
 
 const API_BASE = import.meta.env.VITE_API_BASE
 
@@ -28,14 +29,20 @@ export const userApi = createApi({
         method: 'POST',
         body,
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: [
+        'User',
+        {type: 'Todo', id: 'LIST'}
+      ],
     }),
     logout: builder.mutation({
       query: () => ({
         url: '/auth/logout',
         method: 'POST',
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: [
+        'User',
+        { type: 'Todo', id: 'LIST'}
+      ],
     }),
   }),
 })

@@ -8,7 +8,10 @@ const Todos = () => {
   const [editingId, setEditingId] = useState(null);
   const [editTitle, setEditTitle] = useState('');
 
-  const {data: todos = [], isLoading, isError, Error} = useGetTodosQuery();
+  const {data: todos = [], isLoading, isError, Error} = useGetTodosQuery(
+    undefined,
+    {refetchOnMountOrArgChange: true}
+  );
   const [addTodo, result] = useAddTodoMutation()
   const [updateTodo] = useUpdateTodoMutation()
   const [deleteTodo] = useDeleteTodoMutation()
